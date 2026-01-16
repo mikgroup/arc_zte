@@ -1,0 +1,8 @@
+numpy
+matplotlib
+sigpy
+sympy
+h5py
+tqdm
+notebook<7
+
