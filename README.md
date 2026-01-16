@@ -1,9 +1,10 @@
 # Arc-ZTE
-This repository contains code to reproduce figures in paper "Arc-ZTE: Incoherent temporal sampling for flexible, dynamic, quiet Zero-TE MRI using continuously-slewed
-gradients" and to compute custom Arc-ZTE trajectories. 
+This repository contains code to reproduce figures in paper "Arc-ZTE: Incoherent temporal sampling for flexible, dynamic, quiet Zero-TE MRI using continuously-slewed gradients". 
+
+This repository also contains code to compute Arc-ZTE segment trajectories for any desired arc angle using the optimization scheme to calculate per-TR twist angles without inducing gradient refocusing, as described in the paper. 
 
 ## Computing Arc-ZTE trajectories
-The folder `arc_zte_sim` contains python code that computes an Arc-ZTE trajectory for any custom arc angle. The optimization-based computation of the per-TR twist angles described in the paper can be run with the provided script with a call similar to this: 
+The folder `arc_zte_sim` contains python code that computes an Arc-ZTE trajectory for any custom arc angle. The per-TR twist angle optimization can be run with the provided script using a call like: 
 
 `python run_arczte_seg_optim.py --arc_angle 53 --nSpokes_seg 384`
 
