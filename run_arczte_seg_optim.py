@@ -32,7 +32,7 @@ def parse_args():
         help="Number of test angles for discretized theta space"
     )
     parser.add_argument(
-        "--out_rotmat_txt_path", type=str, required=False, default='rotmats_1seg.txt', 
+        "--out_rotmat_txt_path", type=str, required=False, default=None, 
         help="Path of output text file to save rotations"
     )
     parser.add_argument(
@@ -40,7 +40,7 @@ def parse_args():
         help="Set true to also save traj coordinates"
     )
     parser.add_argument(
-        "--out_coords_npy_path", type=str, required=False, default='coords_1seg.npy', 
+        "--out_coords_npy_path", type=str, required=False, default=None, 
         help="Path of output npy file to save coordinates"
     )
     return parser.parse_args()
@@ -52,6 +52,12 @@ def main():
     with grid search for lamda to choose smallest value with no refocusing
     """
     args = parse_args()
+
+    # Output save paths
+    if args.out_rotmat_txt_path is None:
+        args.out_rotmat_txt_path = f"rotmats_1seg_{args.arc_angle}deg_{args.nSpokes_seg}spokes.txt"
+    if args.out_coords_npy_path is None:
+        args.out_coords_npy_path = f"coords_1seg_{args.arc_angle}deg_{args.nSpokes_seg}spokes.npy"
 
     print(f"Calculating trajectory for arc angle {args.arc_angle}")
     for lamda in args.lambdas_for_grid_search: 
@@ -75,7 +81,7 @@ def main():
             print(f"Finished grid search! No instances of refocusing occured for lambda {lamda}")
 
             covg_metric = cov_uniformity_metric(scheme.spoke_arr.transpose(0,2,1)[:, -1, :], n=3000)
-            print(f"Coverage uniformity metric was {covg_metric}\n ")
+            print(f"Coverage uniformity metric was {covg_metric:.3f}\n ")
 
             save_Rs_txt(scheme, args.out_rotmat_txt_path)
             print(f"Saved rotation matrices for segment at {args.out_rotmat_txt_path}")

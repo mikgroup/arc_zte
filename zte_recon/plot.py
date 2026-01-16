@@ -175,8 +175,6 @@ def plot_coherence_pathways(DataObj, nSpokes_plot=20, spoke_start_idx=0, ylim=2)
     plt.axhline(y=1, linestyle='--', c='green', alpha=0.75)
 
 
-
-
 def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx=0):
     '''
     Coords dim [nSpokes, nPts, 3]

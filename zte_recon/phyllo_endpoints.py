@@ -1,13 +1,28 @@
+
+"""
+Functions for phyllotaxis trajectory provided by Tobias Wood, KCL
+
+Code follows trajectory formulation in this paper: 
+
+Ljungberg E, Wood TC, et al. Motion corrected silent ZTE neuroimaging. 
+Magn Reson Med. 2022;88(1):195-210. doi:10.1002/mrm.29201
+
+"""
+
 import numpy as np 
 
-##### Phyllotaxis trajectory code ####
-
 def phyllo_endpoints_merlin(spokes_per_seg, smoothness, spokes_total, gm):
-    '''
-    Function that outputs endpoints of phyllotaxis 
-    '''
-    # gm is True if golden means rotation between segments.
-    # smoothness is s in MERLIN paper
+    """Function that calculates endpoints of phyllotaxis radial ZTE schemes 
+
+    Args:
+        spokes_per_seg (int): _description_
+        smoothness (int): smoothness factor in MERLIN paper
+        spokes_total (int): spokes for entire trajectory
+        gm (bool): True if golden means rotations between segments
+
+    Returns:
+        np.array (spokes_total, 3): spoke endpoints normalized to [-0.5, 0.5]
+    """
 
     nseg = np.uint32(spokes_total // spokes_per_seg)
     phi_gold = 2.399963229728653
@@ -37,7 +52,7 @@ def phyllo_endpoints_merlin(spokes_per_seg, smoothness, spokes_total, gm):
 
 def _gm(gm, ii):
     # Rotation matrix is golden means rotation if gm is True. Else identity
-    # ii is index of segment for which # rotation matrix
+    # ii is index of segment for which number rotation matrix
     if gm:
         phi_gm1 = 0.465571231876768
         phi_gm2 = 0.682327803828019
