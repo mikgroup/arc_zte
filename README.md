@@ -1,3 +1,5 @@
+**Work in Progress**
+
 # Arc-ZTE
 This repository contains code to reproduce figures in paper "Arc-ZTE: Incoherent temporal sampling for flexible, dynamic, quiet Zero-TE MRI using continuously-slewed gradients". 
 
@@ -16,4 +18,4 @@ The repo uses [`sigpy`](https://github.com/mikgroup/sigpy) and the python interf
 
 To save gifs from reconstructed numpy arrays, [`array2gif`](https://github.com/tanyaschlusser/array2gif) was used. 
 
-A `requirements.txt` file is also provided with exact versions used in our tests. 
+A `requirements.txt` file is also provided for convenient virtual environment setup. 
