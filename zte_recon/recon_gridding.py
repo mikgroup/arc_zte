@@ -1,7 +1,7 @@
 import sigpy as sp
 import sigpy.mri as mr
 import numpy as np
-from util.nufft_util import nufft_adjoint_postcompensation, nufft_adjoint_postcompensation_numpy
+from .util.nufft_util import nufft_adjoint_postcompensation, nufft_adjoint_postcompensation_numpy
 from tqdm import tqdm
 
 def recon_adjoint_postcomp_coilbycoil(ksp, coord, img_shape, oversamp=2, norm="ortho", device_num=0):

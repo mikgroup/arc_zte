@@ -3,14 +3,14 @@ import h5py
 from scipy.io import loadmat
 import sigpy as sp
 
-from arc_zte_traj import calc_all_curved_grads, get_segment_waveform_from_kacq_file, rotate_integrate_all_segments
-from util.grad_corr import shift_coord
-from util.cc_pca import find_A_cc_pca, apply_cc_ksp, find_A_cc_rovir
-from phyllo_endpoints import phyllo_endpoints_merlin
-from util.nufft_util import nufft_adjoint_postcompensation_numpy
-from bellows import read_bellows_data, create_bins, resample_bellows_data
-from recon_gridding import recon_adjoint_postcomp_coilbycoil_cpu
-from bart_dims import ksp_to_bart
+from .arc_zte_traj import calc_all_curved_grads, get_segment_waveform_from_kacq_file, rotate_integrate_all_segments
+from .phyllo_endpoints import phyllo_endpoints_merlin
+from .util.nufft_util import nufft_adjoint_postcompensation_numpy
+from .bellows import read_bellows_data, create_bins, resample_bellows_data
+from .recon_gridding import recon_adjoint_postcomp_coilbycoil_cpu
+
+from .util.grad_corr import shift_coord
+from .util.cc import apply_cc_ksp, find_A_cc_rovir
 
 class Data_ZTE():
     '''
@@ -65,12 +65,12 @@ class Data_ZTE():
         self.nSpokes = param_file['N']['spokeshig'][0][0][0][0] # only RUFIS spokes
         self.waspi_scale = param_file['N']['WASPI_factor'][0][0][0][0] # default is 8
         self.spokes_per_seg = np.uint32(param_file['N']['spokesPerSeg'][0][0][0][0])
-        self.tr = (1/1000000) * (param_file['N']['act_tr'][0][0][0][0] / self.spokes_per_seg) # in s
+        self.tr = (1e-6) * (param_file['N']['act_tr'][0][0][0][0] / self.spokes_per_seg) # in s
         
         self.num_segs = np.uint32(self.nSpokes / self.spokes_per_seg)
         self.num_segs_lowres = np.uint32(self.nInSpokes / self.spokes_per_seg)
 
-        self.highMerge = 6 # TODO read from CVs?
+        self.highMerge = 6 # used only if both RUFIS and WASPI spokes in recon
 
         # Dead time total is acquired dead time + dropped points due to coil ringing
         self.dead_time = -1*self.feextra + self.ndrop_ROpts

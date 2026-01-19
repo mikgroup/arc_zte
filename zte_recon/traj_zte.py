@@ -1,7 +1,8 @@
 import numpy as np
-from phyllo_endpoints import phyllo_endpoints_merlin
-from arc_zte_traj import calc_all_curved_grads, get_segment_waveform_from_kacq_file, rotate_integrate_all_segments, read_params_from_kacq
 from scipy.io import loadmat
+
+from .phyllo_endpoints import phyllo_endpoints_merlin
+from .arc_zte_traj import get_segment_waveform_from_kacq_file, rotate_integrate_all_segments, read_params_from_kacq
 
 '''
 Classes to only set up trajectories without data files
@@ -11,11 +12,11 @@ Standard, AZTEK, and Arc-ZTE require external files from acquisition
 class Traj_ZTE():
     ''' DO NOT Instantiate - just a parent class '''   
 
-    def __init__(self, opxres, waspi_scale=8, dead_time=0):
+    def __init__(self, opxres, waspi_scale=8, dead_time=3):
         self.opxres = opxres 
         self.waspi_scale = waspi_scale
         self.highMerge = 6
-        self.dead_time = dead_time # if 0, this trajectory doesn't have dead time gap
+        self.dead_time = dead_time
 
     def setup_waspi_spokes(self):
         '''
@@ -37,27 +38,27 @@ class Traj_ZTE():
 
 
 
-class Traj_Product_ZTE(Traj_ZTE):
+class Traj_Standard_ZTE(Traj_ZTE):
 
-    def __init__(self, opxres, matlab_save_dir, waspi_scale=8):
+    def __init__(self, opxres, data_h5_dir, waspi_scale=8):
          
         super().__init__(opxres, waspi_scale)
 
         ## Load parameters file
         try:
-            param_file = loadmat(matlab_save_dir +'/param.mat')
+            param_file = loadmat(data_h5_dir +'/param.mat')
         except:
-            raise FileNotFoundError(f"Param.mat file not found in {matlab_save_dir}")
+            raise FileNotFoundError(f"Param.mat file not found in {data_h5_dir}")
         self.nInSpokes = param_file['N']['spokeslow'][0][0][0][0] # only WASPI spokes
         self.nSpokes = param_file['N']['spokeshig'][0][0][0][0] # only RUFIS spokes
         
 
         ## Read coords from matlab directory
         try:
-            ktraj_file = loadmat(matlab_save_dir + '/coord.mat')
+            ktraj_file = loadmat(data_h5_dir + '/coord.mat')
             self.coord_full = (ktraj_file['K']).transpose(1,0,2)
         except: 
-            print("Coord.mat file not found in matlab_save_dir")
+            print("Coord.mat file not found in data directory")
 
         self.setup_hires_spokes()
         self.setup_waspi_spokes()
@@ -120,17 +121,19 @@ class Traj_CalcPhyllo_ZTE(Traj_ZTE):
                  
 
     
-class Traj_AZTEK_from_endpoints(Traj_ZTE):
+class Traj_RadialZTE_from_kacq(Traj_ZTE):
     '''
-    AZTEK trajectory using endpoints file saved in EPIC
+    Radial ZTE trajectory calculation using endpoints file saved in EPIC
     '''
 
-    def __init__(self, opxres, endpoints_txt_path, waspi_scale=8):
+    def __init__(self, opxres, endpoints_txt_path, spokes_per_seg, 
+                 num_segs_lowres, waspi_scale=8):
 
         super().__init__(opxres, waspi_scale)
 
         self.endpoints_txt_path = endpoints_txt_path
         self.opxres = opxres
+        self.nInSpokes = spokes_per_seg * num_segs_lowres
 
         self.get_coords()
         self.setup_hires_spokes()
@@ -200,6 +203,7 @@ class Traj_ArcZTE_from_kacq(Traj_ZTE):
         self.dt_sampling = acq_params['dt_sampling']
         self.arc_angle = acq_params['arc_angle']
         self.params = acq_params
+        self.nInSpokes = self.num_segs_lowres * self.spokes_per_seg
 
         self.get_coords_using_kacq_file()
         self.setup_hires_spokes()
@@ -232,7 +236,7 @@ class Traj_ArcZTE_from_kacq(Traj_ZTE):
 class Traj_Calc_ArcZTE(Traj_ZTE):
 
     '''Calculate Arc-ZTE trajectory given parameters
-    Does not account for any timing errors in real scanner, so not recommended to use for recon
+    Does not account for any timing errors in real scanner
     '''
 
     def __init__(self, opxres, arc_angle, spoke_rot_file, seg_rot_file, params, 

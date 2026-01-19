@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from util.plot_util import get_viridis_color_grad
+from .util.plot_util import get_viridis_color_grad
 
 def plot_3d_axes():
     fig = plt.figure()

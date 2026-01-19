@@ -1,7 +1,8 @@
 import cupy as cp
 import sigpy as sp
 import numpy as np
-from recon_gridding import recon_adjoint_postcomp_coilbycoil
+
+from .recon_gridding import recon_adjoint_postcomp_coilbycoil
 
 def calc_psf_coords(coords_input, img_shape):
     '''
