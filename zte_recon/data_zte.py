@@ -16,10 +16,10 @@ class Data_ZTE():
     '''
     Do not instantiate. Just template data class for different types of ZTE data
     '''
-    def __init__(self, matlab_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
+    def __init__(self, h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
                  FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1):
         '''
-        matlab_save_dir should have ksp.h5 and param.mat
+        h5_save_dir should have ksp.h5 and param.mat
         nPtsPerSpoke to choose points < opxres. Defaults to acquired opxres. 
         
         FOV_scale_dir scales differently in different directions
@@ -32,13 +32,13 @@ class Data_ZTE():
         '''
 
         # Save all passed arguments
-        self.matlab_save_dir = matlab_save_dir
+        self.h5_save_dir = h5_save_dir
         self.rBW = rBW
         self.FOV_scale = FOV_scale
         self.FOV_scale_dir = FOV_scale_dir
         self.ndrop_ROpts = ndrop_ROpts
         
-        # Read parameters file from matlab_save_dir
+        # Read parameters file from h5_save_dir
         self.read_params_file()
         self.load_ksp_from_file()
 
@@ -53,9 +53,9 @@ class Data_ZTE():
         '''
         ## Load parameters file
         try:
-            param_file = loadmat(self.matlab_save_dir +'/param.mat')
+            param_file = loadmat(self.h5_save_dir +'/param.mat')
         except:
-            raise FileNotFoundError(f"Param.mat file not found in {self.matlab_save_dir}")
+            raise FileNotFoundError(f"Param.mat file not found in {self.h5_save_dir}")
         
         # Save all relevant parameters
         self.nInSpokes = param_file['N']['spokeslow'][0][0][0][0] # only WASPI spokes
@@ -79,8 +79,8 @@ class Data_ZTE():
     def load_ksp_from_file(self):
         '''Load full k-space from h5 file
         '''
-        print('Loading ksp from h5 dir: ' + self.matlab_save_dir)
-        f = h5py.File(self.matlab_save_dir + 'ksp.h5', 'r')
+        print('Loading ksp from h5 dir: ' + self.h5_save_dir)
+        f = h5py.File(self.h5_save_dir + 'ksp.h5', 'r')
         self.ksp_full = (np.array(f['real']) + 1j*np.array(f['imag']))[:, 0] 
         self.nCoils = self.ksp_full.shape[0]
 
@@ -426,10 +426,10 @@ class Data_EndpointsFile_ZTE(Data_ZTE):
     '''
 
     def __init__(self, endpoints_txt_path, 
-                 matlab_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
+                 h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
                  FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1):
 
-        super().__init__(matlab_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
+        super().__init__(h5_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
 
         self.endpoints_txt_path = endpoints_txt_path
 
@@ -475,10 +475,10 @@ class Data_CalcPhyllo_ZTE(Data_ZTE):
     '''
 
     def __init__(self, smoothness, gm_flag, segsPerInterleaf, 
-                 matlab_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
+                 h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
                  FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1):
         
-        super().__init__(matlab_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
+        super().__init__(h5_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
 
         self.smoothness = smoothness
 
@@ -528,10 +528,10 @@ class Data_Product_ZTE(Data_ZTE):
     '''For product sequence 3dradial, MATLAB code calculates trajectory 
     '''
     def __init__(self, 
-                 matlab_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
+                 h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
                  FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1):
         
-        super().__init__(matlab_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
+        super().__init__(h5_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
 
         self.get_coords()
         self.setup_hires_spokes()
@@ -540,10 +540,10 @@ class Data_Product_ZTE(Data_ZTE):
     def get_coords(self):
         # Read coords from matlab directory
         try:
-            ktraj_file = loadmat(self.matlab_save_dir + '/coord.mat')
+            ktraj_file = loadmat(self.h5_save_dir + '/coord.mat')
             self.coord_full = (ktraj_file['K']).transpose(1,0,2)  # is NOT FOV_scaled
         except: 
-            print("Coord.mat file not found in matlab_save_dir")
+            print("Coord.mat file not found in h5_save_dir")
 
 
 
@@ -554,14 +554,33 @@ class Data_Arc_ZTE(Data_ZTE):
     coord_full - not FOV scaled. Removes non-sampled points at end of TR
     
     '''
-
     def __init__(self, spoke_rot_file, seg_rot_file, arc_angle, points_per_spoke, 
                  points_before_curve, dt_sampling, grad_dt_sampling, a_grad, grad_segment_file,
-                 matlab_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
+                 h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
                  FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1, 
                  points_grad_k0_delay=0):
+        """_summary_
+
+        Args:
+            spoke_rot_file (_type_): _description_
+            seg_rot_file (_type_): _description_
+            arc_angle (_type_): _description_
+            points_per_spoke (_type_): _description_
+            points_before_curve (_type_): _description_
+            dt_sampling (_type_): _description_
+            grad_dt_sampling (_type_): _description_
+            a_grad (_type_): _description_
+            grad_segment_file (_type_): _description_
+            h5_save_dir (_type_): _description_
+            nPtsPerSpoke (_type_, optional): _description_. Defaults to None.
+            rBW (_type_, optional): _description_. Defaults to 31.25e3.
+            FOV_scale (int, optional): _description_. Defaults to 1.
+            FOV_scale_dir (list, optional): _description_. Defaults to [1,1,1].
+            ndrop_ROpts (int, optional): _description_. Defaults to 1.
+            points_grad_k0_delay (int, optional): _description_. Defaults to 0.
+        """
         
-        super().__init__(matlab_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
+        super().__init__(h5_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
 
         # Save Arc-ZTE arguments
         self.spoke_rot_file = spoke_rot_file

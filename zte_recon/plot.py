@@ -223,17 +223,17 @@ def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx
 
     plt.ylabel('Cycles/voxel')
     plt.xlabel('time')
-    plt.ylim([0, 2])
-    plt.yticks([0, 0.5, 1, 2])
+    plt.ylim([0, 3])
+    plt.yticks([0, 0.5, 1, 3])
     ax = plt.gca()
-    ax.set_yticklabels(['0', '0.5', '1', '2'])
+    ax.set_yticklabels(['0', '0.5', '1', '3'])
 
     plt.tick_params(left = True, right = False , labelleft = True , 
                     labelbottom = False, bottom = False) 
-    plt.legend(loc='upper right')
+    plt.legend(loc='upper left')
 
     plt.axhline(y=0.5, linestyle='--', c='r')
-    plt.axhline(y=1, linestyle='--', c='m')
+    plt.axhline(y=1, linestyle='--', c='forestgreen')
 
 
 def plot_spokes_temporal_color(ax, coords_in, nSpokes_plot=384, elev=-174, azim=-53):
