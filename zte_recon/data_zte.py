@@ -216,9 +216,10 @@ class Data_ZTE():
                                        [lowres_nPts, lowres_nPts, lowres_nPts]), axes=[0,1,2])
 
         # Run recon at slightly higher res for visualization
-        coil_ims_lowres = nufft_adjoint_postcompensation_numpy(self.ksp_hires[:, :, :lowres_nPts], 
+        coil_ims_lowres = nufft_adjoint_postcompensation(self.ksp_hires[:, :, :lowres_nPts], 
                                                    self.coord_sampl_hires[:, :lowres_nPts], 
-                                                    oshape=[self.nCoils, *mask_sphere_interp.shape])
+                                                    oshape=[self.nCoils, *mask_sphere_interp.shape], 
+                                                    device=-1)
         return coil_ims_lowres * mask_sphere_interp[None]
     
 
@@ -555,55 +556,35 @@ class Data_Arc_ZTE(Data_ZTE):
     coord_full - not FOV scaled. Removes non-sampled points at end of TR
     
     '''
-    def __init__(self, spoke_rot_file, seg_rot_file, arc_angle, points_per_spoke, 
-                 points_before_curve, dt_sampling, grad_dt_sampling, a_grad, grad_segment_file,
-                 h5_save_dir, nPtsPerSpoke=None, rBW=31.25e3, 
-                 FOV_scale=1, FOV_scale_dir=[1,1,1], ndrop_ROpts=1, 
-                 points_grad_k0_delay=0):
-        """_summary_
+    def __init__(self, kacq_file, seg_rot_file, 
+                 acq_params, h5_save_dir, nPtsPerSpoke=None, 
+                 rBW=31.25e3, FOV_scale=1, FOV_scale_dir=[1,1,1], 
+                 ndrop_ROpts=1, points_grad_k0_delay=0, 
+                 dt_sampling=8, grad_dt_sampling=4):
 
-        Args:
-            spoke_rot_file (_type_): _description_
-            seg_rot_file (_type_): _description_
-            arc_angle (_type_): _description_
-            points_per_spoke (_type_): _description_
-            points_before_curve (_type_): _description_
-            dt_sampling (_type_): _description_
-            grad_dt_sampling (_type_): _description_
-            a_grad (_type_): _description_
-            grad_segment_file (_type_): _description_
-            h5_save_dir (_type_): _description_
-            nPtsPerSpoke (_type_, optional): _description_. Defaults to None.
-            rBW (_type_, optional): _description_. Defaults to 31.25e3.
-            FOV_scale (int, optional): _description_. Defaults to 1.
-            FOV_scale_dir (list, optional): _description_. Defaults to [1,1,1].
-            ndrop_ROpts (int, optional): _description_. Defaults to 1.
-            points_grad_k0_delay (int, optional): _description_. Defaults to 0.
-        """
         
         super().__init__(h5_save_dir, nPtsPerSpoke, rBW, FOV_scale, FOV_scale_dir, ndrop_ROpts)
 
         # Save Arc-ZTE arguments
-        self.spoke_rot_file = spoke_rot_file
         self.seg_rot_file = seg_rot_file
-        self.arc_angle = arc_angle # TODO read from file
-        self.points_per_spoke = np.uint32(points_per_spoke) # TODO read from CVs
-        self.points_before_curve = points_before_curve # TODO read from CVs
-        self.dt_sampling = dt_sampling # TODO read from CVs
-        self.a_grad = a_grad # TODO read from CVs
+        self.arc_angle = acq_params['arc_angle']
+        self.points_per_spoke = np.uint32(acq_params['points_per_spoke'] ) 
+        self.points_before_curve = np.uint32(acq_params['points_before_curve'])
+        self.a_grad = acq_params['a_grad'] 
+        
+        self.dt_sampling = dt_sampling
         self.grad_dt_sampling = grad_dt_sampling
         # Delay between RF & grad (only needed for ArcZTE) in units of grad_dt_sampling
         # Can do positive or negative or float up to multiples of 0.25. Negative means grad is delayed
         self.points_grad_k0_delay = points_grad_k0_delay 
 
-        # Grad file saved by EPIC - testing for now
-        if grad_segment_file is not None:
-            self.grad_segment_file = grad_segment_file
-            self.get_coords_using_kacq_file()
-        else:
-            self.get_coords()
+        # Get coordinates using kacq file
+        self.grad_segment_file = kacq_file
+        self.get_coords_using_kacq_file()
+        # Set up trajectories - RUFIS and WASPI
         self.setup_hires_spokes()
         self.setup_waspi_spokes()
+
 
     def get_coords_using_kacq_file(self):
         '''
@@ -624,31 +605,6 @@ class Data_Arc_ZTE(Data_ZTE):
 
         acquired_res = self.opxres # TODO: check that this is giving the correct resolution
         scale_factor_fov = acquired_res * 1/(2*self.coord_full.max()) # digitize acquired resolution
-        self.coord_full *= scale_factor_fov
-
-
-    def get_coords(self):
-        ''' 
-        Must be run before setup hires spokes and setup waspi spokes. Calculates trajectory
-        '''
-
-        self.spokes_all, self.grads_all, self.grads_flat_one_seg = calc_all_curved_grads(
-                    self.spoke_rot_file, self.seg_rot_file, self.arc_angle, 
-                    self.points_per_spoke, self.points_before_curve, 
-                    self.dt_sampling, self.a_grad, self.num_segs, self.num_segs_lowres, 
-                    self.spokes_per_seg, self.waspi_scale
-                )
-        
-        ## Calculate correct scaling for reconstructing correcting FOV
-        self.coord_full = np.copy(self.spokes_all[:, 0:self.opxres]) # only sampling part of gradients
-
-        acquired_res = self.opxres # TODO: check that this is giving the correct resolution
-        scale_factor_fov = acquired_res * 1/(2*self.coord_full.max()) # digitize acquired resolution
-
-        # TMP code: to test if kmax being slightly smaller was affecting results
-        # self.kmax_tmp = 1/(2*self.FOV/self.opxres)
-        # scale_factor_fov = self.opxres * 1/(2*self.kmax_tmp)
-
         self.coord_full *= scale_factor_fov
 
 
