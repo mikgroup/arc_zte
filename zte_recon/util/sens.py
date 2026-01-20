@@ -36,7 +36,7 @@ def est_maps_3d(ksp_lowres, coord_lowres, img_shape, soft_sens=False,
 
     # Inverse gridding of lowres data
     inv_nufft_cmd = f"nufft -i -d {grid_size}:{grid_size}:{grid_size}"
-    lowres_img = bart.bart(1, inv_nufft_cmd, coord_lowres, ksp_lowres)s
+    lowres_img = bart.bart(1, inv_nufft_cmd, coord_lowres, ksp_lowres)
 
     # Get lowres gridded k-space
     lowres_cart_ksp = bart.bart(1, 'fft 7', lowres_img)

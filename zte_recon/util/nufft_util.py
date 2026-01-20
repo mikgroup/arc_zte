@@ -10,14 +10,48 @@ from sigpy import backend, interp, util
 from sigpy.fourier import _scale_coord, _get_oversamp_shape, _apodize
 
 
-def nufft_adjoint_postcompensation(input, coord, oshape=None, oversamp=2, width=4, norm="ortho"):
-    """Adjoint non-uniform Fast Fourier Transform.
+def nufft_adjoint_postcompensation(input, coord, oshape=None, oversamp=2, 
+                                   width=4, norm="ortho"):
+    """Adjoint NUFFT. Modified version of sigpy function to use 
+    density compensation with gridded ones, since typical k-space weighting
+    by sampling density causes issues with ZTE dead time gap.
 
-    Based on code from sigpy, with small modification for post-compensation
+    Original sigpy function: 
+    https://sigpy.readthedocs.io/en/latest/_modules/sigpy/fourier.html#nufft_adjoint
+
+    Density post-compensation is performed by gridding a vector of ones 
+    to create a density map (dc). This map is smoothed with a Gaussian 
+    filter ($\sigma=0.65$) before dividing the gridded data. 
+
+    A threshold of $10^{-6}$ is applied to the density map to avoid 
+    division by zero/samll values in unsampled regions of k-space. 
+
+    Parameters
+    ----------
+    input : ndarray, (nSpokes, nReadout)
+        Non-Cartesian k-space data. Can be a NumPy or CuPy array.
+    coord : ndarray, (nSpokes, nReadout, nDim)
+        K-space coordinates. Scaled such that they range from -N/2 to N/2.
+    oshape : tuple of int, optional 
+        Output image shape e.g. [nX, nY, nZ]
+        If None, estimated from `coord`.
+    oversamp : float, optional
+        Oversampling factor for the internal Cartesian grid, by default 2.
+    width : int, optional
+        Interpolation kernel width (Kaiser-Bessel), by default 4.
+    norm : str, optional
+        Normalization for the FFT/IFFT operation, by default "ortho".
+
+    Returns
+    -------
+    output : ndarray, oshape
+        Reconstructed image
 
     """
     xp = backend.get_array_module(input)
+    device = sp.get_device(input)
 
+    # Estimate oshape if not specified
     ndim = coord.shape[-1]
     beta = np.pi * (((width / oversamp) * (oversamp - 0.5))**2 - 0.8)**0.5
     if oshape is None:
@@ -32,14 +66,15 @@ def nufft_adjoint_postcompensation(input, coord, oshape=None, oversamp=2, width=
     output = interp.gridding(input, coord, os_shape,
                                 kernel='kaiser_bessel', width=width, param=beta)
     output /= width**ndim
+    # Grid ones for density compensation
     dc = interp.gridding(xp.ones(input.shape), coord, os_shape,
                              kernel='kaiser_bessel', width=width, param=beta)
     if xp == cp: 
         dc = dc.get()
     # smooth density compensation with gaussian with size 2*ceil(osamp/2)+1
-    dc = sp.to_device(ndimage.gaussian_filter(dc, sigma=0.65), 0) # using matlab's default sigma
+    dc = sp.to_device(ndimage.gaussian_filter(dc, sigma=0.65), device) # using matlab's default sigma
 
-    # mask where density compensation > 1e-6 instead of  != 0
+    # Apply density compensation where > 1e-6. Avoid dividing by small values
     output[dc > 1e-6] /= dc[dc > 1e-6] 
 
     # IFFT

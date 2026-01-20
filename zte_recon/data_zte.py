@@ -5,9 +5,9 @@ import sigpy as sp
 
 from .arc_zte_traj import calc_all_curved_grads, get_segment_waveform_from_kacq_file, rotate_integrate_all_segments
 from .phyllo_endpoints import phyllo_endpoints_merlin
-from .util.nufft_util import nufft_adjoint_postcompensation_numpy
 from .bellows import read_bellows_data, create_bins, resample_bellows_data
-from .recon_gridding import recon_adjoint_postcomp_coilbycoil_cpu
+from .recon_gridding import recon_adjoint_postcomp_coilbycoil
+from .util.nufft_util import nufft_adjoint_postcompensation
 
 from .util.grad_corr import shift_coord
 from .util.cc import apply_cc_ksp, find_A_cc_rovir
@@ -183,9 +183,10 @@ class Data_ZTE():
             self.mask_sphere = mask_sphere
     
             # Calculate lowres coil images using WASPI data
-            coil_ims_lowres = nufft_adjoint_postcompensation_numpy(self.ksp_waspi, 
-                                                                self.coord_waspi, 
-                                                                oshape=[self.nCoils, *mask_sphere.shape])
+            coil_ims_lowres = nufft_adjoint_postcompensation(self.ksp_waspi, 
+                                                            self.coord_waspi, 
+                                                            oshape=[self.nCoils, *mask_sphere.shape], 
+                                                            device=-1)
             self.coil_ims_lowres = coil_ims_lowres
 
             print('Solving for rovir compression matrix')
@@ -412,9 +413,9 @@ class Data_ZTE():
             raise ValueError('Coil compression has not been run yet. Run coil_compress() first')
         
         im_size = np.uint32(self.coord_sampl_hires[:, 0:nPtsLowres, :].max())
-        im_coils = recon_adjoint_postcomp_coilbycoil_cpu(ksp=self.ksp_cc[:, :, 0:nPtsLowres], 
+        im_coils = recon_adjoint_postcomp_coilbycoil(ksp=self.ksp_cc[:, :, 0:nPtsLowres], 
                                                           coord=self.coord_sampl_hires[:, 0:nPtsLowres, :], 
-                                                          img_shape=[im_size, im_size, im_size])
+                                                          img_shape=[im_size, im_size, im_size], device=-1)
         
         
         return im_coils

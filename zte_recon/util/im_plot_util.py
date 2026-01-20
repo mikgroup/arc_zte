@@ -1,5 +1,4 @@
 import numpy as np
-import os
 import cfl
 from .gif import array_to_gif_pillow
 
