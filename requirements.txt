@@ -5,4 +5,4 @@ sympy
 h5py
 tqdm
 notebook<7
-
+array2gif

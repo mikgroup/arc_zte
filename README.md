@@ -6,16 +6,20 @@ This repository contains code to reproduce figures in paper "Arc-ZTE: Incoherent
 This repository also contains code to compute Arc-ZTE segment trajectories for any desired arc angle using the optimization scheme to calculate per-TR twist angles without inducing gradient refocusing, as described in the paper. 
 
 ## Computing Arc-ZTE trajectories
-The folder `arc_zte_sim` contains python code that computes an Arc-ZTE trajectory for one segment for any custom arc angle. The per-TR twist angle optimization can be run with the provided script using a call like: 
+The optimization to select per-TR twist angles can be run with the provided script using a call like:
 
-`python run_arczte_seg_optim.py --arc_angle 53 --nSpokes_seg 384 --out_rotmat_txt_path rotmats_1seg_optim_angle53.txt`
+`python run_arczte_seg_optim.py --arc_angle 53 --nSpokes_seg 384`
 
-The folder `rot_txt_files` contains the Arc-ZTE rotation matrices we used for our tests across different per-TR twist angle schemes and different arc angles (Figure 3 and 4). These can be used directly for a scanner implementation to rotate the arc spoke gradients every TR and create a continuous segment. 
+This script will save the rotation matrices each TR in the designed segment to a .txt file and the trajectory coordinates for the segment as a .npy file. Paths can be specified using the arguments `--out_rotmat_txt_path` and `--out_coords_npy_path` respectively. 
 
-To create the different segments of the trajectory, we used golden angles to rotate this single segment in 3D, where the rotation matrices are listed in `rot_txt_files/seg_golden3d_rotMats.txt`.
+The folder `rot_txt_files` contains the rotation matrices .txt files we used for our tests shown in the paper (Figure 3 and 4). These files can be used directly for a scanner implementation to rotate the arc spoke gradients every TR and create gradient waveforms for a continuous segment. 
+
+To create the different segments of the trajectory, we used golden angles to rotate this single segment in 3D; the rotation matrices we used are listed in `rot_txt_files/seg_golden3d_rotMats.txt`.
 
 ## Reproducing paper figures
 The folder contains Jupyter notebooks that reproduces figures in the paper. Acquired phantom and in-vivo data will be available soon for download. 
+
+Notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
 - Visualize trajectories (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
 - Comparison of optimization scheme vs. naive schemes for per-TR twist angle selection (Figure 3): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure3.ipynb)
