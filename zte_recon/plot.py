@@ -114,68 +114,8 @@ def plot_format_ismrm_abstract(ax):
     ax.set_zlabel(r'$\mathrm{k_z}$', fontsize=15)
 
 
-def plot_coherence_pathways(DataObj, nSpokes_plot=20, spoke_start_idx=0, ylim=2):
-    '''
-    Coords dim [nSpokes, nPts, 3]
-    '''
-    # Initialize array to store kstronauts to plot
-    kstronauts = np.empty((nSpokes_plot, 3, DataObj.nPtsPerSpoke))
-    nPoints =  DataObj.nPtsPerSpoke
-    
-     # Normalize coords from DataObj
-    coords_normalized = DataObj.coord_radial_spokes / (2*DataObj.coord_radial_spokes.max())
-
-    for i in range(nSpokes_plot):
-        
-        # Get ith spoke
-        spoke = coords_normalized[i+spoke_start_idx].transpose(1,0)
-        kstronauts[i] = spoke
-        
-        # Plot all kstronaut from ith excitation
-        if (i == 0):
-            c = 'b'
-            label='From TR #' + str(spoke_start_idx+1)
-        elif (i == 1):
-            c = 'c'
-            label='From TR #' + str(spoke_start_idx+2)
-        else:
-            c = 'y'
-            label=None
-        plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(spoke, axis=0), c, label=label)
-
-        # Plot all previous coherences evolving during same TR
-        # Plot only 60 previous coherences, assuming complex T2* dephasing
-        for j in np.arange(0, i):
-            kstronauts[j] = spoke + kstronauts[j][:, -1][:, None] # update previous kstronauts
-            label=None
-
-            if (j == 0):
-                c = 'b'
-
-            elif (j == 1):
-                c = 'c'
-
-            else:
-                c = 'y'
-            plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(kstronauts[j], axis=0), c)
-
-
-    plt.ylabel('Cycles/voxel')
-    plt.xlabel('time')
-    plt.ylim([0, ylim])
-    plt.yticks([0, 0.5, 1, ylim])
-    ax = plt.gca()
-    
-    ax.set_yticklabels(['0', '0.5', '1', str(ylim)])
-
-    plt.tick_params(left = True, right = False , labelleft = True , 
-                    labelbottom = False, bottom = False) 
-    plt.legend(loc='upper right')
-    plt.axhline(y=0.5, linestyle='--', c='crimson', alpha=0.75)
-    plt.axhline(y=1, linestyle='--', c='green', alpha=0.75)
-
-
-def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx=0):
+def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx=0, 
+                                        legend_loc='upper left'):
     '''
     Coords dim [nSpokes, nPts, 3]
     '''
@@ -230,10 +170,11 @@ def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx
 
     plt.tick_params(left = True, right = False , labelleft = True , 
                     labelbottom = False, bottom = False) 
-    plt.legend(loc='upper left')
+    plt.legend(loc=legend_loc)
 
     plt.axhline(y=0.5, linestyle='--', c='r')
     plt.axhline(y=1, linestyle='--', c='forestgreen')
+
 
 
 def plot_spokes_temporal_color(ax, coords_in, nSpokes_plot=384, elev=-174, azim=-53):

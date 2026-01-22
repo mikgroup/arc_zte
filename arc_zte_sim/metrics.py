@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial import SphericalVoronoi
 
 
-def cov_uniformity_metric(endpoints_in, n=1000, print_flag=False, seed=0):
+def cov_uniformity_metric(endpoints_in, n=10000, print_flag=False, seed=0):
     """
     Calculates the average distance to closest spoke from endpoints from n randomly generated points
     
@@ -127,7 +127,8 @@ def refocusing_metrics(coords_seg, T2_star=60, TR=2.3, refocus_level=1, num_TR_d
         mean_refocusing_energy = None
         worst_refocusing_instance = None
 
-    print('Percentage of TRs with refocusing: ' + str(num_TRs_with_refocusing / nSpokes))
+    if print_flag:
+        print('Percentage of TRs with refocusing: ' + str(num_TRs_with_refocusing / nSpokes))
 
     return num_TRs_with_refocusing, mean_refocusing_energy, worst_refocusing_instance
 

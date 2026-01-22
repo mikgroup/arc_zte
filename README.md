@@ -27,7 +27,9 @@ Notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
 
 ## Packages used
-The repo uses [`sigpy`](https://github.com/mikgroup/sigpy) and the python interface of [BART](https://mrirecon.github.io/bart/installation.html). Subspace-constrained reconstructions used code from [`ppcs`](https://github.com/sidward/ppcs) (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355)), which requires [`sympy`](https://github.com/sympy/sympy) and [`Chebyshev`](https://github.com/mlazaric/Chebyshev). 
+The repo uses [`sigpy`](https://github.com/mikgroup/sigpy) and the python interface of [BART](https://mrirecon.github.io/bart/installation.html). Polynomial preconditioning for recons run in BART was implemented for now in a separate fork [here](https://github.com/s-ramachandran/bart). It will soon be committed into the main BART repository. 
+
+Subspace-constrained reconstructions used code from [`ppcs`](https://github.com/sidward/ppcs) (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355)), which requires [`sympy`](https://github.com/sympy/sympy) and [`Chebyshev`](https://github.com/mlazaric/Chebyshev). 
 
 To save gifs from reconstructed numpy arrays, [`array2gif`](https://github.com/tanyaschlusser/array2gif) was used. 
 

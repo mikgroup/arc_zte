@@ -3,12 +3,12 @@ import h5py
 from scipy.io import loadmat
 import sigpy as sp
 
-from .arc_zte_traj import calc_all_curved_grads, get_segment_waveform_from_kacq_file, rotate_integrate_all_segments
+from .arc_zte_traj import get_segment_waveform_from_kacq_file, rotate_integrate_all_segments
 from .phyllo_endpoints import phyllo_endpoints_merlin
 from .bellows import read_bellows_data, create_bins, resample_bellows_data
 from .recon_gridding import recon_adjoint_postcomp_coilbycoil
-from .util.nufft_util import nufft_adjoint_postcompensation
 
+from .util.nufft_util import nufft_adjoint_postcompensation
 from .util.grad_corr import shift_coord
 from .util.cc import apply_cc_ksp, find_A_cc_rovir
 
@@ -420,7 +420,6 @@ class Data_ZTE():
         
         
         return im_coils
-
 
 
 class Data_EndpointsFile_ZTE(Data_ZTE):
