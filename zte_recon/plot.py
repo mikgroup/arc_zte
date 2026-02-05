@@ -115,10 +115,15 @@ def plot_format_ismrm_abstract(ax):
 
 
 def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx=0, 
-                                        legend_loc='upper left'):
+                                        legend_loc='upper left', ylim=3, labels=None, 
+                                       spokes_to_highlight=[0,1], start_xaxis=0):
     '''
     Coords dim [nSpokes, nPts, 3]
     '''
+    if labels is None:
+        labels = ['From TR #' + str(spoke_start_idx + spokes_to_highlight[0] + 1), 
+                  'From TR #' + str(spoke_start_idx + spokes_to_highlight[1] + 1)]
+        
     [nSpokes, nPoints, nDims] = coords.shape
     
     # Initialize array to store kstronauts to plot
@@ -134,47 +139,65 @@ def plot_coherence_pathways_from_coords(coords, nSpokes_plot=20, spoke_start_idx
         kstronauts[i] = spoke
         
         # Plot all kstronaut from ith excitation
-        if (i == 0):
+        if (i == spokes_to_highlight[0]):
             c = 'b'
-            label='From TR #'+str(spoke_start_idx+1)
-        elif (i == 1):
+            label=labels[0]
+            alpha = 1
+            zorder = 100
+        elif (i == spokes_to_highlight[1]):
             c = 'c'
-            label='From TR #'+str(spoke_start_idx+2)
+            label=labels[1]
+            alpha = 1
+            zorder = 100
         else:
             c = 'y'
             label=None
-        plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(spoke, axis=0), c, label=label)
+            alpha = 1
+            zorder = 1
+        plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(spoke, axis=0), c, 
+                 label=label, alpha=alpha, marker=None, zorder=zorder)
 
         # Plot all previous coherences evolving during same TR
-        for j in range(i):
+        for j in np.arange(0, i):
             kstronauts[j] = spoke + kstronauts[j][:, -1][:, None] # update previous kstronauts
             label=None
 
-            if (j == 0):
+            if (j == spokes_to_highlight[0]):
                 c = 'b'
+                alpha = 1
+                zorder = 100
 
-            elif (j == 1):
+            elif (j == spokes_to_highlight[1]):
                 c = 'c'
+                alpha = 1
+                zorder = 100
 
             else:
                 c = 'y'
-            plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(kstronauts[j], axis=0), c)
+                alpha = 0.9
+                zorder = 1
+                
+            plt.plot(np.arange(i*nPoints, (i+1)*nPoints, 1), np.linalg.norm(kstronauts[j], axis=0), c, 
+                     alpha=alpha, markevery=10, zorder=zorder)
 
 
     plt.ylabel('Cycles/voxel')
     plt.xlabel('time')
-    plt.ylim([0, 3])
-    plt.yticks([0, 0.5, 1, 3])
+    plt.ylim([0, ylim])
+    plt.yticks([0, 0.5, 1, ylim])
     ax = plt.gca()
-    ax.set_yticklabels(['0', '0.5', '1', '3'])
+    ax.set_yticklabels(['0', '0.5', '1', str(ylim)])
 
     plt.tick_params(left = True, right = False , labelleft = True , 
-                    labelbottom = False, bottom = False) 
-    plt.legend(loc=legend_loc)
+                    labelbottom = False, bottom = False)
+    if legend_loc is not None:
+        leg = plt.legend(loc=legend_loc)
+        leg.set_zorder(110)
 
     plt.axhline(y=0.5, linestyle='--', c='r')
     plt.axhline(y=1, linestyle='--', c='forestgreen')
-
+    
+    ax.set_xlim([nPoints*start_xaxis, nPoints*nSpokes_plot])
 
 
 def plot_spokes_temporal_color(ax, coords_in, nSpokes_plot=384, elev=-174, azim=-53):

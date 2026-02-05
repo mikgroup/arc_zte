@@ -22,8 +22,7 @@ The folder contains Jupyter notebooks that reproduces figures in the paper. Acqu
 Notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
 - Visualize trajectories (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
-- Comparison of optimization scheme vs. naive schemes for per-TR twist angle selection (Figure 3): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure3.ipynb)
-- Comparison across range of arc angles (Figure 4): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure4.ipynb)
+- Evaluation of selection for per-TR twist angles and arc angles (Figure 3 and 4): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure3_and_4.ipynb)
 
 
 ## Packages used
