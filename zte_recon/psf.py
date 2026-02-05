@@ -4,7 +4,7 @@ import numpy as np
 
 from .recon_gridding import recon_adjoint_postcomp_coilbycoil
 
-def calc_psf_coords(coords_input, img_shape):
+def calc_psf_coords(coords_input, img_shape, device_num=0):
     '''
     coords_input dims = [nSPokes, nPts, 3]
     '''
@@ -15,10 +15,11 @@ def calc_psf_coords(coords_input, img_shape):
              img_shape[2]//2] = 1.0
 
     # Combine waspi and hires
-    ksp_sim = sp.nufft(point_3d, sp.to_device(coords_input, 0))
+    ksp_sim = sp.nufft(point_3d, sp.to_device(coords_input, device_num))
 
     # Adjoint coil-by-coil recon
-    im_coils = recon_adjoint_postcomp_coilbycoil(ksp_sim[None], coords_input, img_shape, norm=None)
+    im_coils = recon_adjoint_postcomp_coilbycoil(ksp_sim[None], coords_input, img_shape, 
+                                                 norm=None, disable_tqdm=True)
 
     return im_coils[0]
 

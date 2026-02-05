@@ -42,6 +42,21 @@ class Traj_ZTE:
         # Remove 0s from coord_sampl
         self.coord_sampl_hires = coord_sampl_hires[:, self.dead_time :]
 
+    def combine_waspiHires_flat(self, spokes_subset=None):
+
+        coord_waspi_sampl = self.coord_waspi
+
+        # Choose subset of spokes if inputted
+        if spokes_subset is not None:
+            coord_sampl = self.coord_sampl_hires[spokes_subset]
+        else:
+            coord_sampl = self.coord_sampl_hires
+
+        coord_flat = np.concatenate((coord_waspi_sampl.reshape(-1, 3), 
+                                                    coord_sampl.reshape(-1, 3)), axis=0)
+        
+        return coord_flat
+
 
 class Traj_Standard_ZTE(Traj_ZTE):
 

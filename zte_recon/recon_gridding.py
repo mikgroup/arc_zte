@@ -4,7 +4,8 @@ from .util.nufft_util import nufft_adjoint_postcompensation
 from tqdm import tqdm
 
 def recon_adjoint_postcomp_coilbycoil(ksp, coord, img_shape, oversamp=2, 
-                                      norm="ortho", device=0):
+                                      norm="ortho", device=0, 
+                                      disable_tqdm=False):
     """Coil-by coil reconstruction using adjoint NUFFT using
     gridded ones density (post-)compensation
 
@@ -32,7 +33,9 @@ def recon_adjoint_postcomp_coilbycoil(ksp, coord, img_shape, oversamp=2,
     # Transfer if GPU device
     coord = sp.to_device(coord, device)
 
-    for i in tqdm(range(nCoils), desc ="Coil-by-coil Gridding recon"):
+    for i in tqdm(range(nCoils), 
+                  desc ="Coil-by-coil Gridding recon", 
+                  disable=disable_tqdm):
 
         # Transfer if  GPU device
         ksp_coil = sp.to_device(ksp[i], device)
