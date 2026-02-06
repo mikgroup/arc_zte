@@ -6,3 +6,4 @@ h5py
 tqdm
 notebook<7
 Pillow
+cupy-cuda12x

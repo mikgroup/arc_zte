@@ -1,9 +1,7 @@
-**Work in Progress**
-
 # Arc-ZTE
 This repository contains code to reproduce figures in paper "Arc-ZTE: Incoherent temporal sampling for flexible, dynamic, quiet Zero-TE MRI using continuously-slewed gradients". 
 
-This repository also contains code to compute Arc-ZTE segment trajectories for any desired arc angle using the optimization scheme to calculate per-TR twist angles without inducing gradient refocusing, as described in the paper. 
+This repository also contains a script to compute custom Arc-ZTE segment trajectories for any desired arc angle. This script runs the optimization scheme to calculate per-TR twist angles, as described in the paper. 
 
 ## Computing Arc-ZTE trajectories
 The optimization to select per-TR twist angles can be run with the provided script using a call like:
@@ -16,6 +14,12 @@ The folder `rot_txt_files` contains the rotation matrices .txt files we used for
 
 To create the different segments of the trajectory, we used golden angles to rotate this single segment in 3D; the rotation matrices we used are listed in `rot_txt_files/seg_golden3d_rotMats.txt`.
 
+#### Comparison radial ZTE trajectories
+
+Code for calculating AZTEK trajectories can be found in [`this Github repo`](https://github.com/BioMaps-MRI/AZTEK) based on [`this paper`](https://pubmed.ncbi.nlm.nih.gov/32936490/): "AZTEK: Adaptive Zero TE K-space trajectories. Tanguy Boucneau, Brice Fernandez, Florent Besson, Anne Menini, Florian Wiesinger, Emmanuel Durand, Caroline Caramella, Luc Darrasse, and Xavier Maître". We have implemented this trajectory on our scanner and save the readout endpoints as a txt file for reconstruction. 
+
+Code for calculating trajectories for the Phyllotaxis scheme has been provided by Tobias Wood based on [`this paper`](https://pmc.ncbi.nlm.nih.gov/articles/PMC9321117/): "Motion corrected silent ZTE neuroimaging. Ljungberg E, Wood TC, Solana AB, Williams SCR, Barker GJ, Wiesinger F."
+
 ## Reproducing paper figures
 The folder contains Jupyter notebooks that reproduces figures in the paper. Acquired phantom and in-vivo data will be available soon for download. 
 
@@ -23,14 +27,14 @@ Notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
 - Visualize trajectories (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
 - Evaluation of Arc-ZTE trajectory (Figures 3,4 and 5): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
-- Visualization of comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/supplementary_Figure1.ipynb)
+- Visualize comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/supplementary_Figure1.ipynb)
 
+#### Data
+Data can be downloaded from: 
 
-## Packages used
-The repo uses [`sigpy`](https://github.com/mikgroup/sigpy) and the python interface of [BART](https://mrirecon.github.io/bart/installation.html). Polynomial preconditioning for recons run in BART was implemented for now in a separate fork [here](https://github.com/s-ramachandran/bart). It will soon be committed into the main BART repository. 
+## Dependencies and packages
+The repository uses the BART framework from this fork [here](https://github.com/s-ramachandran/bart), which can be cloned and compiled using `make`. Here, we have implemented polynomial preconditioning (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355); [`Code`](https://github.com/sidward/ppcs)) to use with `pics`; it will soon be committed into the main BART repository.
 
-Subspace-constrained reconstructions used code from [`ppcs`](https://github.com/sidward/ppcs) (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355)), which requires [`sympy`](https://github.com/sympy/sympy) and [`Chebyshev`](https://github.com/mlazaric/Chebyshev). 
+A `requirements.txt` file is provided for convenient virtual environment setup. This file will install `sigpy` and other Python packages used by the code. 
 
-To save gifs from reconstructed numpy arrays, [`array2gif`](https://github.com/tanyaschlusser/array2gif) was used. 
-
-A `requirements.txt` file is also provided for convenient virtual environment setup. 
+Full high-resolution reconstructions were run on an A100 GPU. This hardware is not needed if code is run in "demo mode", which only runs a few iterations and low-resolution volumes to demonstrate that the code can run without failing. 
