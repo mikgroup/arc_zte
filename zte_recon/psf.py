@@ -8,8 +8,12 @@ def calc_psf_coords(coords_input, img_shape, device_num=0):
     '''
     coords_input dims = [nSPokes, nPts, 3]
     '''
+    if device_num >= 0:
+        xp = cp
+    else:
+        xp = np
 
-    point_3d = cp.zeros(img_shape, dtype=cp.complex128)
+    point_3d = xp.zeros(img_shape, dtype=xp.complex128)
     point_3d[img_shape[0]//2, 
              img_shape[1]//2, 
              img_shape[2]//2] = 1.0
@@ -19,7 +23,8 @@ def calc_psf_coords(coords_input, img_shape, device_num=0):
 
     # Adjoint coil-by-coil recon
     im_coils = recon_adjoint_postcomp_coilbycoil(ksp_sim[None], coords_input, img_shape, 
-                                                 norm=None, disable_tqdm=True)
+                                                 norm=None, disable_tqdm=True, 
+                                                 device=device_num)
 
     return im_coils[0]
 
