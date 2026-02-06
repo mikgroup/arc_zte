@@ -36,7 +36,7 @@ def parse_args():
         help="Path of output text file to save rotations"
     )
     parser.add_argument(
-        "--save_coords", type=bool, required=False, default=False, 
+        "--save_coords", type=bool, required=False, default=True, 
         help="Set true to also save traj coordinates"
     )
     parser.add_argument(
@@ -84,7 +84,7 @@ def main():
             print(f"Coverage uniformity metric was {covg_metric:.3f}\n ")
 
             save_Rs_txt(scheme, args.out_rotmat_txt_path)
-            print(f"Saved rotation matrices for segment at {args.out_rotmat_txt_path}")
+            print(f"Saved rotation matrices for each spoke in segment at {args.out_rotmat_txt_path}")
 
             if args.save_coords:
                 np.save(args.out_coords_npy_path, scheme.spoke_arr)
