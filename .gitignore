@@ -10,3 +10,4 @@ venv_test/*
 *.h5
 *.mat
 *.xlsx
+.ipynb_checkpoints/*
