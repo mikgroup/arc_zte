@@ -7,3 +7,6 @@ venv_test/*
 *.hdr
 *.png
 *.gif
+*.h5
+*.mat
+*.xlsx
