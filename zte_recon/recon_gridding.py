@@ -47,8 +47,9 @@ def recon_adjoint_postcomp_coilbycoil(ksp, coord, img_shape, oversamp=2,
                                             norm=norm)
         # Transfer if  GPU device
         im_coils[i] = sp.to_device(im, -1)
-    
-    print('Coil-by-coil recon finished')
+
+    if not disable_tqdm:
+        print('Coil-by-coil recon finished')
 
     return im_coils
 
