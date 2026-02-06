@@ -3,7 +3,6 @@ import cupy as cp
 import sigpy as sp
 import h5py as h5py
 from sigpy import backend, util, interp
-from math import ceil
 import scipy.ndimage as ndimage
 
 from sigpy import backend, interp, util
@@ -21,9 +20,9 @@ def nufft_adjoint_postcompensation(input, coord, oshape=None, oversamp=2,
 
     Density post-compensation is performed by gridding a vector of ones 
     to create a density map (dc). This map is smoothed with a Gaussian 
-    filter ($\sigma=0.65$) before dividing the gridded data. 
+    filter (sigma=0.65) before dividing the gridded data. 
 
-    A threshold of $10^{-6}$ is applied to the density map to avoid 
+    A threshold of 10^{-6} is applied to the density map to avoid 
     division by zero/samll values in unsampled regions of k-space. 
 
     Parameters
