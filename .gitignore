@@ -2,7 +2,7 @@
 venv_test/*
 *.npy
 *checkpoint.ipynb
-./data/*
+./data_for_arczte_paper/*
 *.cfl
 *.hdr
 *.png

@@ -26,7 +26,7 @@ The folder contains Jupyter notebooks that reproduces figures in the paper. Acqu
 These notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
 - Visualize trajectories (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
-- Evaluation of Arc-ZTE trajectory (Figures 3,4 and 5): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
+- Evaluation of Arc-ZTE trajectory (Figures 3, 4, and 5): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
 - Reconstructions of phantom acquisitions with Arc-ZTE and comparison radial ZTE (Figure 7): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure7.ipynb)
 - Visualize comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/supplementary_Figure1.ipynb)
 
