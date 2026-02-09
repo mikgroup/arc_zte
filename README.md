@@ -23,9 +23,9 @@ The folder contains Jupyter notebooks that reproduces figures in the paper. Acqu
 
 These notebooks can be run locally on Jupyter Notebook or in Google Colab:
 
-- Visualize trajectories in 3D: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
-- Analysis of Arc-ZTE coverage uniformity and incoherence: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
-- Reconstructions of phantom acquisitions with Arc-ZTE and comparison radial ZTE: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure7.ipynb)
+- Visualize trajectories in 3D (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
+- Analysis of Arc-ZTE coverage uniformity and incoherence (Figures 3 - 5): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
+- Reconstructions of phantom acquisitions with Arc-ZTE and comparison radial ZTE (Figure 7): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure7.ipynb)
 
 - Visualize comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Supplementary_Figure1.ipynb)
 
