@@ -28,13 +28,13 @@ These notebooks can be run locally on Jupyter Notebook or in Google Colab:
 - Visualize trajectories (Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure1.ipynb)
 - Evaluation of Arc-ZTE trajectory (Figures 3, 4, and 5): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figures3_4_5.ipynb)
 - Reconstructions of phantom acquisitions with Arc-ZTE and comparison radial ZTE (Figure 7): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Figure7.ipynb)
-- Visualize comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/supplementary_Figure1.ipynb)
+- Visualize comparison radial ZTE trajectories (Supplementary Figure 1): [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mikgroup/arc_zte/blob/main/Supplementary_Figure1.ipynb)
 
 #### Data
-Data can be downloaded from here: [https://doi.org/10.17605/OSF.IO/X3J8S](https://doi.org/10.17605/OSF.IO/X3J8S). To download the data as a zip file, go to `Files` and click `Download as zip`. Place folder `data_for_arczte_paper` in the same folder as the Jupyter notebooks. 
+Data can be downloaded from here: [https://doi.org/10.17605/OSF.IO/C3SP5](https://doi.org/10.17605/OSF.IO/C3SP5). To download the data as a zip file, go to `Files` and click `Download as zip`. Place folder `data_for_arczte_paper` in the same folder as the Jupyter notebooks. 
 
 ## Dependencies and packages
-The repository uses the BART framework from this fork [here](https://github.com/s-ramachandran/bart), which can be cloned and compiled using `make`. Here, we have implemented polynomial preconditioning (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355); [`Code`](https://github.com/sidward/ppcs)) to use with `pics`; it will soon be committed into the main BART repository.
+The repository uses the BART framework from this fork [here](https://github.com/s-ramachandran/bart), which can be cloned and compiled using `make`. Here, we have implemented polynomial preconditioning to use with `pics` (Paper: [Iyer et al., 2024](https://epubs.siam.org/doi/10.1137/22M1530355); [`Code`](https://github.com/sidward/ppcs)).
 
 A `requirements.txt` file is provided for convenient virtual environment setup. This file will install `sigpy` and other Python packages used by the code. 
 

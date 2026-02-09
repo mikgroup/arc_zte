@@ -59,7 +59,7 @@ def main():
     if args.out_coords_npy_path is None:
         args.out_coords_npy_path = f"coords_1seg_{args.arc_angle}deg_{args.nSpokes_seg}spokes.npy"
 
-    print(f"Calculating trajectory for arc angle {args.arc_angle}")
+    print(f"Calculating trajectory for arc angle {args.arc_angle} for segment with {args.nSpokes_seg} spokes")
     for lamda in args.lambdas_for_grid_search: 
 
         # Run optimization
