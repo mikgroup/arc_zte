@@ -43,3 +43,22 @@ def getRep(period, nSpokes, r):
         group = R @ group
         total = np.concatenate((total, group))
     return np.array(total[0:nSpokes])
+
+
+def read_seg_rotmats_from_txt(seg_rot_file, num_segs_total):
+
+    ## Read segment rotations from file
+    M_file = np.zeros((num_segs_total, 9), dtype=float)
+    count = 0
+
+    with open(seg_rot_file, "r") as file1:
+        
+        for line in file1.readlines():
+            line_list = line.split(" ")
+            if (count >= num_segs_total):
+                break
+            for i in range(9):
+                M_file[count, i] = float(line_list[i])
+            count += 1
+
+    return M_file

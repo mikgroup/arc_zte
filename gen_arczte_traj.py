@@ -4,7 +4,9 @@ import numpy as np
 from arc_zte_sim.metrics import percentage_TRs_with_refocusing_metric, cov_uniformity_metric
 from arc_zte_sim.theta_i_schemes import FurthestDist_CostFunction 
 from arc_zte_sim.rotate_spokes import save_Rs_txt
+from arc_zte_sim.rotate_segments import read_seg_rotmats_from_txt
 
+GOLDEN_ANGLE_3D_ROTS = './rot_txt_files/seg_golden3d_rotMats.txt'
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -15,7 +17,10 @@ def parse_args():
         "--arc_angle", type=float, required=True, help="Arc angle (deg)"
     )
     parser.add_argument(
-        "--nSpokes_seg", type=int, required=True, help="Number of spokes in segment"
+        "--spokes_per_seg", type=int, required=True, help="Number of spokes in segment"
+    )
+    parser.add_argument(
+        "--num_segs", type=int, required=True, help="Number of golden-angle rotated segments"
     )
     
     # Optional arguments
@@ -43,6 +48,11 @@ def parse_args():
         "--out_coords_npy_path", type=str, required=False, default=None, 
         help="Path of output npy file to save coordinates"
     )
+    parser.add_argument(
+        "--seg_rot_txt_file", type=str, required=False, 
+        default=GOLDEN_ANGLE_3D_ROTS, 
+        help="Txt file for rotations of whole segments (groups of continuous TRs)"
+    )
     return parser.parse_args()
 
 
@@ -55,17 +65,21 @@ def main():
 
     # Output save paths
     if args.out_rotmat_txt_path is None:
-        args.out_rotmat_txt_path = f"rotmats_1seg_{args.arc_angle}deg_{args.nSpokes_seg}spokes.txt"
-    if args.out_coords_npy_path is None:
-        args.out_coords_npy_path = f"coords_1seg_{args.arc_angle}deg_{args.nSpokes_seg}spokes.npy"
+        args.out_rotmat_txt_path = f"rotmats_1seg_{args.arc_angle}deg_{args.spokes_per_seg}spokes.txt"
 
-    print(f"Calculating trajectory for arc angle {args.arc_angle} for segment with {args.nSpokes_seg} spokes")
+    if args.out_coords_npy_path is None:
+        args.out_coords_npy_path = f"coords_traj_{args.arc_angle}deg_{args.spokes_per_seg}spokes.npy"
+
+    # Calculate coords for single segment
+    print(f"Calculating trajectory for arc angle {args.arc_angle} for segment with {args.spokes_per_seg} spokes")
     for lamda in args.lambdas_for_grid_search: 
 
         # Run optimization
         scheme = FurthestDist_CostFunction(lamda, args.arc_angle, args.nReadout, 
-                                           args.nSpokes_seg, nTestAngles=args.nTestAngles)
+                                           args.spokes_per_seg, nTestAngles=args.nTestAngles)
         scheme.rotate()
+
+        coords_single_segment = scheme.spoke_arr.transpose(0,2,1) # nSpokes, nReadout, 3
         
         # Calculate instances of refocusing
         refocus_metric = percentage_TRs_with_refocusing_metric(scheme.spoke_arr.transpose(0,2,1), 
@@ -80,21 +94,35 @@ def main():
         elif refocus_metric == 0:
             print(f"Finished grid search! No instances of refocusing occured for lambda {lamda}")
 
-            covg_metric = cov_uniformity_metric(scheme.spoke_arr.transpose(0,2,1)[:, -1, :], n=3000)
+            covg_metric = cov_uniformity_metric(coords_single_segment[:, -1, :], n=3000)
             print(f"Coverage uniformity metric was {covg_metric:.3f}\n ")
 
             save_Rs_txt(scheme, args.out_rotmat_txt_path)
             print(f"Saved rotation matrices for each spoke in segment at {args.out_rotmat_txt_path}")
-
-            if args.save_coords:
-                np.save(args.out_coords_npy_path, scheme.spoke_arr)
-                print(f"Saved trajectory coords for segment at {args.out_coords_npy_path}")
-            break
     
     # Grid search failed
     if refocus_metric != 0:
         raise ValueError('Refocusing occurred for all values of lambdas_for_grid_search. Increase values.')
     
+    # Take calculated single segment and rotate by golden angle
+    coords_full_traj = np.zeros((args.num_segs*args.spokes_per_seg, args.nReadout, 3))
+    M_file = read_seg_rotmats_from_txt(args.seg_rot_txt_file, args.spokes_per_seg)
+
+    for i in range(args.num_segs):
+
+        if i == 0:
+            coords_rot_seg = coords_single_segment # don't rotate first segment
+        else:
+            # apply rotation matrix
+            coords_rot_seg = M_file[i-1].reshape(3,3) @ coords_single_segment.reshape(-1, 3).transpose(1,0) # [3, spokes*RO]
+            coords_rot_seg = coords_rot_seg.transpose(1,0).reshape(args.spokes_per_segs, args.nReadout, 3) # reshape back
+
+        coords_full_traj[i*args.spokes_per_seg : (i+1)*args.spokes_per_seg] = coords_rot_seg
+    
+    # Save coordinates to npy file if specified
+    if args.save_coords:
+        np.save(args.out_coords_npy_path, coords_full_traj)
+        print(f"Saved trajectory coords for segment at {args.out_coords_npy_path}")
 
 if __name__ == "__main__":
     main()

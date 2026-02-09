@@ -261,40 +261,6 @@ def integrate_grads_one_segment(grad_one_seg, spokes_per_seg, opxres, points_per
     assert dt_sampling % grad_dt_sampling == 0, "dt_sampling needs to be a multiple of gradient sampling time"
     m = dt_sampling // grad_dt_sampling 
 
-    ## Old code
-        # if m == 1:
-
-        #     for k in range(spokes_per_seg):
-
-        #         # Integrate spoke starting at points_before_curve. Add 0 to be first element for k=0
-        #         intg_start = (k*points_per_spoke)+points_before_curve + points_grad_k0_delay
-        #         intg_end = intg_start + opxres
-        #         spoke_arr[k] = cumulative_trapezoid(grad_one_seg[:, intg_start:intg_end], 
-        #                                                 dx=gamma_bar * dt_sampling * 0.001, axis=-1, 
-        #                                                 initial=0) * gamma_bar * dt_sampling * 0.001
-        #         # spoke_arr[k] = np.cumsum(grad_one_seg[:, intg_start:intg_end], axis=-1) * gamma_bar * dt_sampling * 0.001
-        
-        #######################
-        ## Integrate at m times finer, then choose every mth point to get kspace coords. Reduces to above code if m == 1
-
-        # ## Find kspace spokes for 1 segment sampled at grad_dt_sampling
-        # spoke_arr_for_grad_sampling = np.zeros((spokes_per_seg, 3, (opxres-1)*m + 1)) # one segment of spokes
-
-        # for k in range(spokes_per_seg):
-
-        #     # Integrate spoke starting at points_before_curve. Add 0 to be first element for k=0
-        #     intg_start = (k*points_per_spoke) + points_before_curve + points_grad_k0_delay
-        #     intg_end = intg_start + (opxres-1)*m + 1
-        #     spoke_arr_for_grad_sampling[k] = cumulative_trapezoid(grad_one_seg[:, intg_start:intg_end], 
-        #                                             dx=gamma_bar * grad_dt_sampling * 0.001, axis=-1, 
-        #                                             initial=0) * gamma_bar * grad_dt_sampling * 0.001
-
-        # # Pick out integral values every mth value to get final spoke arr
-        # if m > 1:
-        #     spoke_arr = spoke_arr_for_grad_sampling[:, :, 0::m]
-        # else:
-        #     spoke_arr = spoke_arr_for_grad_sampling
-
 
     ### If points_grad_k0_delay is integer, then can use directly (no changes to calculation)
     if points_grad_k0_delay % 1 == 0:
