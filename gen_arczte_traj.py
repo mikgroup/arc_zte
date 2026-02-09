@@ -99,6 +99,7 @@ def main():
 
             save_Rs_txt(scheme, args.out_rotmat_txt_path)
             print(f"Saved rotation matrices for each spoke in segment at {args.out_rotmat_txt_path}")
+            break
     
     # Grid search failed
     if refocus_metric != 0:
