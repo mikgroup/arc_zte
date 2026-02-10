@@ -27,6 +27,14 @@ def parse_args():
     parser.add_argument(
         "--nReadout", type=int, default=256, required=False, help="Number of readout points per spoke"
     )
+    # Optional arguments
+    parser.add_argument(
+        "--TR", type=float, default=2.3e-3, required=False, help="TR in s"
+    )
+    # Optional arguments
+    parser.add_argument(
+        "--grad_dt", type=float, default=8e-6, required=False, help="Sampling dwell time in s"
+    )
     parser.add_argument(
         "--nTestAngles", type=int, default=200, required=False, 
         help="Number of test angles for discretized theta space"
@@ -76,10 +84,12 @@ def main():
 
         # Run optimization
         scheme = FurthestDist_CostFunction(lamda, args.arc_angle, args.nReadout, 
-                                           args.spokes_per_seg, nTestAngles=args.nTestAngles)
+                                           args.spokes_per_seg, args.grad_dt, 
+                                           args.TR, nTestAngles=args.nTestAngles)
         scheme.rotate()
 
-        coords_single_segment = scheme.spoke_arr.transpose(0,2,1) # nSpokes, nReadout, 3
+        # Dims [nSpokes, nReadout, 3]
+        coords_single_segment = scheme.spoke_arr.transpose(0,2,1)[:, 0:args.nReadout]
         
         # Calculate instances of refocusing
         refocus_metric = percentage_TRs_with_refocusing_metric(scheme.spoke_arr.transpose(0,2,1), 
@@ -116,7 +126,7 @@ def main():
         else:
             # apply rotation matrix
             coords_rot_seg = M_file[i-1].reshape(3,3) @ coords_single_segment.reshape(-1, 3).transpose(1,0) # [3, spokes*RO]
-            coords_rot_seg = coords_rot_seg.transpose(1,0).reshape(args.spokes_per_segs, args.nReadout, 3) # reshape back
+            coords_rot_seg = coords_rot_seg.transpose(1,0).reshape(args.spokes_per_seg, args.nReadout, 3) # reshape back
 
         coords_full_traj[i*args.spokes_per_seg : (i+1)*args.spokes_per_seg] = coords_rot_seg
     
