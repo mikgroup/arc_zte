@@ -24,7 +24,7 @@ def phyllo_endpoints_merlin(spokes_per_seg, smoothness, spokes_total, gm):
         np.array (spokes_total, 3): spoke endpoints normalized to [-0.5, 0.5]
     """
 
-    nseg = np.uint32(spokes_total // spokes_per_seg)
+    nseg = np.int32(spokes_total // spokes_per_seg)
     phi_gold = 2.399963229728653
     dphi = phi_gold * _fib(smoothness)
 

@@ -294,7 +294,7 @@ def integrate_grads_one_segment(grad_one_seg, spokes_per_seg, opxres, points_per
     for k in range(spokes_per_seg):
 
         # Integrate spoke starting at points_before_curve. Add 0 to be first element for k=0
-        intg_start = np.uint32( ((k*points_per_spoke)+points_before_curve + points_grad_k0_delay) * interp_factor)
+        intg_start = np.int32( ((k*points_per_spoke)+points_before_curve + points_grad_k0_delay) * interp_factor)
         intg_end = intg_start + (opxres-1)*m*interp_factor + 1 
         try: 
             # Initial integration value is 0. Output has same shape as grad_one_seg[:, intg_start:intg_end],

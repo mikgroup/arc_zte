@@ -64,11 +64,11 @@ class Data_ZTE():
         self.FOV = (0.1) * param_file['N']['fov'][0][0][0][0] # UNITS of self.FOV: in cm
         self.nSpokes = param_file['N']['spokeshig'][0][0][0][0] # only RUFIS spokes
         self.waspi_scale = param_file['N']['WASPI_factor'][0][0][0][0] # default is 8
-        self.spokes_per_seg = np.uint32(param_file['N']['spokesPerSeg'][0][0][0][0])
+        self.spokes_per_seg = np.int32(param_file['N']['spokesPerSeg'][0][0][0][0])
         self.tr = (1e-6) * (param_file['N']['act_tr'][0][0][0][0] / self.spokes_per_seg) # in s
         
-        self.num_segs = np.uint32(self.nSpokes / self.spokes_per_seg)
-        self.num_segs_lowres = np.uint32(self.nInSpokes / self.spokes_per_seg)
+        self.num_segs = np.int32(self.nSpokes / self.spokes_per_seg)
+        self.num_segs_lowres = np.int32(self.nInSpokes / self.spokes_per_seg)
 
         self.highMerge = 6 # used only if both RUFIS and WASPI spokes in recon
 
@@ -313,7 +313,7 @@ class Data_ZTE():
         self.nBins = nBins
 
         # setup indices for each bin
-        nSpokesPerBinSingleSeg = np.uint32(self.spokes_per_seg // nBins)
+        nSpokesPerBinSingleSeg = np.int32(self.spokes_per_seg // nBins)
         nSpokesPerBin = nSpokesPerBinSingleSeg * self.num_segs
 
         # Bin ksp and coords into bins and make sure same number of spokes in each bin
@@ -369,7 +369,7 @@ class Data_ZTE():
 
         # drop segments based on undersampl_frac
         if undersampl_frac is not None:
-            segs_to_keep = np.uint32((1-undersampl_frac) * (self.num_segs-ndropSegs))
+            segs_to_keep = np.int32((1-undersampl_frac) * (self.num_segs-ndropSegs))
             coord_ir = coord_ir[:, 0:segs_to_keep]
             ksp_ir = ksp_ir[:, :, 0:segs_to_keep]
 
@@ -389,7 +389,7 @@ class Data_ZTE():
             coils = self.nCoils
 
         nRO = ksp.shape[-1]
-        nFrames = np.uint32(np.floor(self.nSpokes / spokesPerFrame))
+        nFrames = np.int32(np.floor(self.nSpokes / spokesPerFrame))
 
         ksp_frames = np.zeros((nFrames, coils, spokesPerFrame, nRO), dtype=np.complex128)
         coord_frames = np.zeros((nFrames, spokesPerFrame, nRO, 3))
@@ -413,7 +413,7 @@ class Data_ZTE():
         if hasattr(self, 'ksp_cc') == False:
             raise ValueError('Coil compression has not been run yet. Run coil_compress() first')
         
-        im_size = np.uint32(self.coord_sampl_hires[:, 0:nPtsLowres, :].max())
+        im_size = np.int32(self.coord_sampl_hires[:, 0:nPtsLowres, :].max())
         im_coils = recon_adjoint_postcomp_coilbycoil(ksp=self.ksp_cc[:, :, 0:nPtsLowres], 
                                                           coord=self.coord_sampl_hires[:, 0:nPtsLowres, :], 
                                                           img_shape=[im_size, im_size, im_size], device=-1)
@@ -567,8 +567,8 @@ class Data_Arc_ZTE(Data_ZTE):
         # Save Arc-ZTE arguments
         self.seg_rot_file = seg_rot_file
         self.arc_angle = acq_params['arc_angle']
-        self.points_per_spoke = np.uint32(acq_params['points_per_spoke'] ) 
-        self.points_before_curve = np.uint32(acq_params['points_before_curve'])
+        self.points_per_spoke = np.int32(acq_params['points_per_spoke'] ) 
+        self.points_before_curve = np.int32(acq_params['points_before_curve'])
         self.a_grad = acq_params['a_grad'] 
         
         self.dt_sampling = dt_sampling
